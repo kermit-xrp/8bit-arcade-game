@@ -1,0 +1,87 @@
+import pygame
+import random
+
+# Inicjalizacja Pygame
+pygame.init()
+
+# Ustawienie rozmiaru okna
+size = (600, 400)
+screen = pygame.display.set_mode(size)
+
+# Ustawienie tytułu gry
+pygame.display.set_caption("8-bitowa gra zręcznościowa")
+
+# Ustawienie koloru tła
+bg_color = (255, 255, 255)
+
+# Ustawienie parametrów gracza
+player_width = 40
+player_height = 40
+player_x = size[0] / 2
+player_y = size[1] - player_height - 10
+player_color = (0, 0, 0)
+
+# Ustawienie prędkości ruchu gracza
+player_speed = 5
+
+# Ustawienie parametrów przeszkód
+obstacle_width = 40
+obstacle_height = 40
+obstacle_color = (255, 0, 0)
+
+# Tworzenie listy przeszkód
+obstacles = []
+
+# Funkcja do dodawania przeszkód
+def add_obstacle():
+    obstacle_x = random.randint(0, size[0] - obstacle_width)
+    obstacle_y = 0
+    obstacles.append([obstacle_x, obstacle_y])
+
+# Funkcja do rysowania obiektów
+def draw_object(x, y, width, height, color):
+    pygame.draw.rect(screen, color, [x, y, width, height])
+
+# Główna pętla gry
+running = True
+clock = pygame.time.Clock()
+score = 0
+while running:
+    # Obsługa zdarzeń
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Ruch gracza
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and player_x > 0:
+        player_x -= player_speed
+    elif keys[pygame.K_RIGHT] and player_x < size[0] - player_width:
+        player_x += player_speed
+
+    # Dodanie przeszkód
+    if random.randint(0, 50) == 0:
+        add_obstacle()
+
+    # Ruch przeszkód
+    for i, obstacle in enumerate(obstacles):
+        obstacle[1] += 5
+        if obstacle[1] > size[1]:
+            obstacles.pop(i)
+
+    # Kolizja z przeszkodami
+    for obstacle in obstacles:
+        if player_x < obstacle[0] + obstacle_width and player_x + player_width > obstacle[0] and player_y < obstacle[1] + obstacle_height and player_y + player_height > obstacle[1]:
+            running = False
+
+    # Wyczyszczenie tła i rysowanie obiektów
+    screen.fill(bg_color)
+    draw_object(player_x, player_y, player_width, player_height, player_color)
+    for obstacle in obstacles:
+        draw_object(obstacle[0], obstacle[1], obstacle_width, obstacle_height, obstacle_color)
+
+    # Wyświetlanie wyniku
+    score += 1
+    font = pygame.font.Font(None, 36)
+    text = font.render("Wynik: " + str(score), 1, (0,
+
